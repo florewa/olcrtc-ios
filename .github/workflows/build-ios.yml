@@ -6,11 +6,11 @@ on:
       core_repository:
         description: olcRTC core repository (owner/name)
         required: true
-        default: Oleglog/Olcrtc_manager
+        default: florewa/Olcrtc_manager
       core_ref:
         description: Branch, tag, or commit of olcRTC core
         required: true
-        default: server-v1.9.69
+        default: server-v1.9.70
   push:
     branches: [main]
     tags: ['v*']
@@ -23,8 +23,8 @@ jobs:
   build:
     runs-on: macos-15
     env:
-      CORE_REPOSITORY: ${{ inputs.core_repository || 'Oleglog/Olcrtc_manager' }}
-      CORE_REF: ${{ inputs.core_ref || 'server-v1.9.69' }}
+      CORE_REPOSITORY: ${{ inputs.core_repository || 'florewa/Olcrtc_manager' }}
+      CORE_REF: ${{ inputs.core_ref || 'server-v1.9.70' }}
     steps:
       - name: Checkout iOS client
         uses: actions/checkout@v4

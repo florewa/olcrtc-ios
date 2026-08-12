@@ -5,7 +5,7 @@ Go-ядро olcRTC и публикует локальный SOCKS5 на `127.0.0
 туннеля используется отдельный клиент из App Store, например Happ.
 
 Проект сохраняет совместимость с сервером и Admin UI из
-[`Oleglog/Olcrtc_manager`](https://github.com/Oleglog/Olcrtc_manager): панель
+[`florewa/Olcrtc_manager`](https://github.com/florewa/Olcrtc_manager): панель
 создаёт ключи, `client_id`, URI и подписки, а приложение их импортирует.
 
 ## Состояние первой версии
@@ -18,6 +18,7 @@ Go-ядро olcRTC и публикует локальный SOCKS5 на `127.0.0
 - `vp8channel` и `datachannel`;
 - загрузка обычных `/sub/<slug>` подписок;
 - открытие `olcrtc://subscription?...` deep link;
+- расшифровка AES-256-GCM зеркала подписки с Yandex Disk, если VPS недоступен;
 - хранение URI, ключей и URL подписок в iOS Keychain;
 - локальный SOCKS5 с случайным логином и паролем;
 - best-effort привязка WebRTC-сокетов к физическому интерфейсу, чтобы избежать
@@ -28,7 +29,6 @@ Go-ядро olcRTC и публикует локальный SOCKS5 на `127.0.0
 
 Пока не реализовано:
 
-- зашифрованное зеркало подписки с Яндекс Диска;
 - SOCKS5 UDP ASSOCIATE в ядре olcRTC;
 - встроенный iOS `NetworkExtension` (он намеренно не нужен);
 - публикация в App Store.
@@ -56,13 +56,13 @@ olcRTC необходимо запустить **до включения Happ**.
 `systemd`, официальный установщик панели запускается так:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Oleglog/Olcrtc_manager/master/server-install/olcrtc-setup.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/florewa/Olcrtc_manager/master/server-install/olcrtc-setup.sh | sudo bash
 ```
 
 После установки:
 
 1. Открыть адрес Admin UI, который напечатает установщик.
-2. Сразу сменить стандартные учётные данные панели.
+2. Сохранить напечатанный установщиком случайный пароль панели.
 3. Создать экземпляр `telemost + vp8channel` или `wbstream + vp8channel`.
 4. Панель сама создаст ключ и `client_id`.
 5. Скопировать `olcrtc://` URI либо создать подписку и скопировать её URL.
@@ -76,8 +76,8 @@ curl -fsSL https://raw.githubusercontent.com/Oleglog/Olcrtc_manager/master/serve
 
 1. Создать новый GitHub-репозиторий и загрузить туда содержимое этого каталога.
 2. Открыть `Actions -> Build unsigned iOS IPA -> Run workflow`.
-3. Оставить `core_ref=server-v1.9.69`, если сервер устанавливается из релиза
-   1.9.69. При обновлении сервера собирать клиент из того же тега.
+3. Оставить `core_ref=server-v1.9.70`. При обновлении сервера собирать клиент
+   из того же тега.
 4. Дождаться зелёной сборки.
 5. Скачать artifact `olcrtc-ios-unsigned`.
 6. Проверить SHA-256 из соседнего файла.

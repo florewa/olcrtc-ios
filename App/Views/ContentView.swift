@@ -134,6 +134,11 @@ struct ContentView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+                    if subscription.mirror != nil {
+                        Label("Зашифрованное зеркало Yandex Disk", systemImage: "lock.shield")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                     HStack {
                         Button("Обновить") {
                             Task { await manager.refreshSubscription(id: subscription.id) }

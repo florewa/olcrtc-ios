@@ -77,7 +77,7 @@ final class ProxyManager: ObservableObject {
         try? persist()
     }
 
-    func addSubscription(name: String, urlString: String) async {
+    func addSubscription(name: String, urlString: String, mirror: SubscriptionMirror? = nil) async {
         guard let url = URL(string: urlString),
               let scheme = url.scheme?.lowercased(),
               scheme == "https" else {
@@ -91,6 +91,7 @@ final class ProxyManager: ObservableObject {
                 url: url
             )
         if !requestedName.isEmpty { record.name = requestedName }
+        if let mirror { record.mirror = mirror }
         do {
             record = try await loadSubscription(record)
             state.subscriptions.removeAll { $0.url == url }
@@ -205,7 +206,27 @@ final class ProxyManager: ObservableObject {
                 notice = "В ссылке отсутствует URL подписки"
                 return
             }
-            Task { await addSubscription(name: items["name"] ?? "", urlString: source) }
+            do {
+                let mirror: SubscriptionMirror?
+                if let mirrorURL = items["mirror_url"], let mirrorKey = items["mirror_key"] {
+                    mirror = try SubscriptionMirror.validated(
+                        type: items["mirror_type"] ?? "yandex_disk",
+                        urlString: mirrorURL,
+                        key: mirrorKey
+                    )
+                } else {
+                    mirror = nil
+                }
+                Task {
+                    await addSubscription(
+                        name: items["name"] ?? "",
+                        urlString: source,
+                        mirror: mirror
+                    )
+                }
+            } catch {
+                notice = error.localizedDescription
+            }
             return
         }
         addProfile(uri: url.absoluteString)
@@ -216,20 +237,21 @@ final class ProxyManager: ObservableObject {
     }
 
     private func loadSubscription(_ source: SubscriptionRecord) async throws -> SubscriptionRecord {
-        var request = URLRequest(url: source.url)
-        request.timeoutInterval = 20
-        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-            throw URLError(.badServerResponse)
-        }
-        guard let text = String(data: data, encoding: .utf8) else {
-            throw NSError(
-                domain: "OlcrtcIOS.Subscription",
-                code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "Подписка должна быть в UTF-8"]
+        do {
+            return try refreshedSubscription(
+                source,
+                text: try await loadPlainSubscription(source.url)
+            )
+        } catch {
+            guard let mirror = source.mirror else { throw error }
+            return try refreshedSubscription(
+                source,
+                text: try await SubscriptionMirrorLoader.load(mirror)
             )
         }
+    }
+
+    private func refreshedSubscription(_ source: SubscriptionRecord, text: String) throws -> SubscriptionRecord {
         let parsed = SubscriptionParser.parse(text)
         guard !parsed.profiles.isEmpty else {
             let suffix = parsed.rejectedLines.isEmpty
@@ -255,6 +277,24 @@ final class ProxyManager: ObservableObject {
             refreshed.refreshIntervalSeconds = interval
         }
         return refreshed
+    }
+
+    private func loadPlainSubscription(_ url: URL) async throws -> String {
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 20
+        request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+        guard let text = String(data: data, encoding: .utf8) else {
+            throw NSError(
+                domain: "OlcrtcIOS.Subscription",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Подписка должна быть в UTF-8"]
+            )
+        }
+        return text
     }
 
     private func isStale(_ subscription: SubscriptionRecord, at date: Date) -> Bool {

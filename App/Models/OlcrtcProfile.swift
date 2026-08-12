@@ -50,6 +50,7 @@ struct SubscriptionRecord: Codable, Identifiable, Equatable {
     var profiles: [OlcrtcProfile]
     var lastUpdated: Date?
     var refreshIntervalSeconds: TimeInterval
+    var mirror: SubscriptionMirror?
 
     init(
         id: UUID = UUID(),
@@ -57,7 +58,8 @@ struct SubscriptionRecord: Codable, Identifiable, Equatable {
         url: URL,
         profiles: [OlcrtcProfile] = [],
         lastUpdated: Date? = nil,
-        refreshIntervalSeconds: TimeInterval = 900
+        refreshIntervalSeconds: TimeInterval = 900,
+        mirror: SubscriptionMirror? = nil
     ) {
         self.id = id
         self.name = name
@@ -65,6 +67,7 @@ struct SubscriptionRecord: Codable, Identifiable, Equatable {
         self.profiles = profiles
         self.lastUpdated = lastUpdated
         self.refreshIntervalSeconds = refreshIntervalSeconds
+        self.mirror = mirror
     }
 }
 
