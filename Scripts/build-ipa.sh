@@ -37,7 +37,13 @@ echo "Building olcRTC XCFramework from $CORE_DIR"
 )
 
 MODULE_MAP=$(find "$ROOT_DIR/OlcrtcCore.xcframework" -name module.modulemap -print -quit)
-test -n "$MODULE_MAP" && grep -q 'framework module OlcrtcCore' "$MODULE_MAP" || {
+test -n "$MODULE_MAP" || {
+	echo "OlcrtcCore module map was not generated" >&2
+	exit 1
+}
+echo "Generated Swift module map: $MODULE_MAP"
+cat "$MODULE_MAP"
+grep -Fq 'framework module "OlcrtcCore" {' "$MODULE_MAP" || {
 	echo "OlcrtcCore Swift module was not generated correctly" >&2
 	exit 1
 }
