@@ -1,0 +1,6 @@
+Olcrtc.xcframework/
+build/
+DerivedData/
+*.ipa
+*.xcodeproj/
+.DS_Store

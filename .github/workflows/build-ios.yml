@@ -1,0 +1,67 @@
+name: Build unsigned iOS IPA
+
+on:
+  workflow_dispatch:
+    inputs:
+      core_repository:
+        description: olcRTC core repository (owner/name)
+        required: true
+        default: Oleglog/Olcrtc_manager
+      core_ref:
+        description: Branch, tag, or commit of olcRTC core
+        required: true
+        default: server-v1.9.69
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    env:
+      CORE_REPOSITORY: ${{ inputs.core_repository || 'Oleglog/Olcrtc_manager' }}
+      CORE_REF: ${{ inputs.core_ref || 'server-v1.9.69' }}
+    steps:
+      - name: Checkout iOS client
+        uses: actions/checkout@v4
+
+      - name: Checkout olcRTC core
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.CORE_REPOSITORY }}
+          ref: ${{ env.CORE_REF }}
+          path: core
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: core/go.mod
+          cache-dependency-path: core/go.sum
+
+      - name: Install build tools
+        run: |
+          brew install xcodegen
+          go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20260410095206-2cfb76559b7b
+          go install golang.org/x/mobile/cmd/gobind@v0.0.0-20260410095206-2cfb76559b7b
+
+      - name: Build unsigned IPA
+        run: sh Scripts/build-ipa.sh "$GITHUB_WORKSPACE/core"
+
+      - name: Run parser tests
+        run: sh Scripts/test-ios.sh
+
+      - name: Write checksum
+        run: shasum -a 256 build/olcrtc-ios-unsigned.ipa > build/olcrtc-ios-unsigned.ipa.sha256
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: olcrtc-ios-unsigned
+          path: |
+            build/olcrtc-ios-unsigned.ipa
+            build/olcrtc-ios-unsigned.ipa.sha256
+          if-no-files-found: error

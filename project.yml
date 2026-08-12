@@ -1,0 +1,50 @@
+name: OlcrtcIOS
+options:
+  bundleIdPrefix: community.openlibre
+  deploymentTarget:
+    iOS: "16.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+targets:
+  OlcrtcIOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+    dependencies:
+      - framework: Olcrtc.xcframework
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: community.openlibre.olcrtc.ios
+        PRODUCT_NAME: olcRTC
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: false
+        INFOPLIST_FILE: App/Info.plist
+        FRAMEWORK_SEARCH_PATHS:
+          - "$(inherited)"
+          - "$(PROJECT_DIR)"
+        LD_RUNPATH_SEARCH_PATHS:
+          - "$(inherited)"
+          - "@executable_path/Frameworks"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: false
+    scheme:
+      testTargets:
+        - OlcrtcIOSTests
+  OlcrtcIOSTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: OlcrtcIOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: community.openlibre.olcrtc.ios.tests
+        GENERATE_INFOPLIST_FILE: true
