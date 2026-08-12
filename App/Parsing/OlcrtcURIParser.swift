@@ -61,7 +61,6 @@ enum OlcrtcURIParser {
         let query = (components.queryItems ?? []).reduce(into: [String: String]()) {
             $0[$1.name.lowercased()] = $1.value ?? ""
         }
-        let compact = shape == "r"
         let keyHex = value(query, compact: "k", long: "key").lowercased()
         guard !keyHex.isEmpty else { throw OlcrtcURIError.missingField("key") }
         let asciiHex = keyHex.utf8.allSatisfy {

@@ -9,7 +9,8 @@ enum OlcrtcBridge {
         MobileSetWBToken(profile.authToken)
         MobileSetVP8Options(profile.vp8FPS, profile.vp8Batch)
         MobileSetDebug(false)
-        let started = try MobileStartWithTransport(
+        var startError: NSError?
+        let started = MobileStartWithTransport(
             profile.carrier,
             profile.transport,
             profile.roomID,
@@ -17,15 +18,18 @@ enum OlcrtcBridge {
             profile.keyHex,
             port,
             user,
-            password
+            password,
+            &startError
         )
-        guard started else { throw bridgeError("Не удалось запустить Go-ядро") }
-        do {
-            let ready = try MobileWaitReady(60_000)
-            guard ready else { throw bridgeError("SOCKS не перешёл в состояние готовности") }
-        } catch {
+        guard started else {
+            throw startError ?? bridgeError("Не удалось запустить Go-ядро")
+        }
+
+        var readyError: NSError?
+        let ready = MobileWaitReady(60_000, &readyError)
+        guard ready else {
             MobileStop()
-            throw error
+            throw readyError ?? bridgeError("SOCKS не перешёл в состояние готовности")
         }
     }
 
