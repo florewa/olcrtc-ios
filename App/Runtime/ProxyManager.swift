@@ -14,7 +14,7 @@ final class ProxyManager: ObservableObject {
     @Published var selectedProfileID: UUID?
     @Published private(set) var status: Status = .stopped
     @Published private(set) var notice: String?
-    @Published var socksPort = 10_808 {
+    @Published var socksPort = 18_080 {
         didSet {
             state.socksPort = socksPort
             try? persist()
@@ -45,7 +45,10 @@ final class ProxyManager: ObservableObject {
             state = try keychain.load()
             socksUser = state.socksUser ?? Self.randomCredential(length: 16)
             socksPassword = state.socksPassword ?? Self.randomCredential(length: 24)
-            socksPort = state.socksPort ?? 10_808
+            // Happ/Xray reserves 10808 for its own local SOCKS inbound. Older
+            // olcRTC builds used the same port, so migrate it even when the
+            // value was already persisted in Keychain.
+            socksPort = state.socksPort == 10_808 ? 18_080 : (state.socksPort ?? 18_080)
             state.socksUser = socksUser
             state.socksPassword = socksPassword
             state.socksPort = socksPort
