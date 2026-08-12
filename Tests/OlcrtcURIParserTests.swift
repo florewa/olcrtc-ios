@@ -1,5 +1,10 @@
 import XCTest
-@testable import OlcrtcIOS
+
+#if SWIFT_PACKAGE
+@testable import OlcrtcParsing
+#else
+@testable import olcRTC
+#endif
 
 final class OlcrtcURIParserTests: XCTestCase {
     private let key = String(repeating: "ab", count: 32)

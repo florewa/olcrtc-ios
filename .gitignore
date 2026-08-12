@@ -1,4 +1,5 @@
 OlcrtcCore.xcframework/
+.build/
 build/
 DerivedData/
 *.ipa

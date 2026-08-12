@@ -29,6 +29,9 @@ jobs:
       - name: Checkout iOS client
         uses: actions/checkout@v4
 
+      - name: Run parser tests
+        run: sh Scripts/test-ios.sh
+
       - name: Checkout olcRTC core
         uses: actions/checkout@v4
         with:
@@ -50,9 +53,6 @@ jobs:
 
       - name: Build unsigned IPA
         run: sh Scripts/build-ipa.sh "$GITHUB_WORKSPACE/core"
-
-      - name: Run parser tests
-        run: sh Scripts/test-ios.sh
 
       - name: Write checksum
         run: shasum -a 256 build/olcrtc-ios-unsigned.ipa > build/olcrtc-ios-unsigned.ipa.sha256

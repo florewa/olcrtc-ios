@@ -1,5 +1,10 @@
 import XCTest
-@testable import OlcrtcIOS
+
+#if SWIFT_PACKAGE
+@testable import OlcrtcParsing
+#else
+@testable import olcRTC
+#endif
 
 final class SubscriptionParserTests: XCTestCase {
     func testSubscriptionMetadataAndProfiles() {

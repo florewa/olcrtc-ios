@@ -109,6 +109,7 @@ Wi-Fi или USB.
 brew install xcodegen
 go install golang.org/x/mobile/cmd/gomobile@v0.0.0-20260410095206-2cfb76559b7b
 go install golang.org/x/mobile/cmd/gobind@v0.0.0-20260410095206-2cfb76559b7b
+sh Scripts/test-ios.sh
 sh Scripts/build-ipa.sh ../Olcrtc_manager
 ```
 
