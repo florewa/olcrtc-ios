@@ -1,6 +1,6 @@
 import Darwin
 import Foundation
-import Mobile
+import OlcrtcCore
 
 // Keeps olcRTC carrier sockets on a physical interface instead of allowing a
 // subsequently enabled Packet Tunnel (Happ) to feed them back into olcRTC's

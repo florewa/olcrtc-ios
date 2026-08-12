@@ -1,5 +1,5 @@
 import Foundation
-import Mobile
+import OlcrtcCore
 
 enum OlcrtcBridge {
     static func start(profile: OlcrtcProfile, port: Int, user: String, password: String) throws {

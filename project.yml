@@ -16,8 +16,8 @@ targets:
     sources:
       - path: App
     dependencies:
-      - framework: Olcrtc.xcframework
-        embed: true
+      - framework: OlcrtcCore.xcframework
+        embed: false
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: community.openlibre.olcrtc.ios
