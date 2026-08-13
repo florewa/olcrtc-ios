@@ -24,12 +24,12 @@ Go-ядро olcRTC и публикует локальный SOCKS5 на `127.0.0
 - best-effort привязка WebRTC-сокетов к физическому интерфейсу, чтобы избежать
   петли через Happ при переподключении;
 - экспорт SOCKS URI в формате Happ/v2ray;
+- SOCKS5 UDP ASSOCIATE для DNS, QUIC, звонков и других UDP-приложений;
 - background audio keep-alive для sideload-сценария;
 - unsigned IPA через GitHub Actions.
 
 Пока не реализовано:
 
-- SOCKS5 UDP ASSOCIATE в ядре olcRTC;
 - встроенный iOS `NetworkExtension` (он намеренно не нужен);
 - публикация в App Store.
 
@@ -125,8 +125,9 @@ sh Scripts/build-ipa.sh ../Olcrtc_manager
 - Полные URI не должны попадать в логи и скриншоты.
 - Background audio keep-alive не гарантирует вечную работу: звонок, смена
   аудиосессии или нехватка памяти могут остановить приложение.
-- Текущий SOCKS olcRTC поддерживает TCP CONNECT. UDP, некоторые игры, звонки и
-  обязательный QUIC пока не пройдут.
+- SOCKS olcRTC поддерживает TCP CONNECT и UDP ASSOCIATE. Однако UDP внутри
+  `vp8channel` всё равно проходит через надёжный KCP-канал, поэтому потери
+  восстанавливаются ценой дополнительной задержки и джиттера.
 - Доступность Telemost/WB/Jitsi зависит от оператора, региона и текущих правил
   фильтрации; ни один провайдер нельзя считать гарантированным навсегда.
 
