@@ -81,10 +81,18 @@ final class ProxyManager: ObservableObject {
     }
 
     func addSubscription(name: String, urlString: String, mirror: SubscriptionMirror? = nil) async {
-        guard let url = URL(string: urlString),
+        let normalizedURL = urlString.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let bootstrapURL = URL(string: normalizedURL),
+           bootstrapURL.scheme?.lowercased() == "olcrtc",
+           bootstrapURL.host?.lowercased() == "subscription" {
+            await addSubscription(from: bootstrapURL, fallbackName: name)
+            return
+        }
+
+        guard let url = URL(string: normalizedURL),
               let scheme = url.scheme?.lowercased(),
               scheme == "https" else {
-            notice = "Подписка должна использовать HTTPS с действительным сертификатом"
+            notice = "Введите HTTPS-ссылку или bootstrap-ссылку olcrtc://subscription"
             return
         }
         let requestedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -201,35 +209,7 @@ final class ProxyManager: ObservableObject {
     func handleDeepLink(_ url: URL) {
         guard url.scheme?.lowercased() == "olcrtc" else { return }
         if url.host?.lowercased() == "subscription" {
-            let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
-            let items = (components?.queryItems ?? []).reduce(into: [String: String]()) {
-                $0[$1.name] = $1.value ?? ""
-            }
-            guard let source = items["url"] else {
-                notice = "В ссылке отсутствует URL подписки"
-                return
-            }
-            do {
-                let mirror: SubscriptionMirror?
-                if let mirrorURL = items["mirror_url"], let mirrorKey = items["mirror_key"] {
-                    mirror = try SubscriptionMirror.validated(
-                        type: items["mirror_type"] ?? "yandex_disk",
-                        urlString: mirrorURL,
-                        key: mirrorKey
-                    )
-                } else {
-                    mirror = nil
-                }
-                Task {
-                    await addSubscription(
-                        name: items["name"] ?? "",
-                        urlString: source,
-                        mirror: mirror
-                    )
-                }
-            } catch {
-                notice = error.localizedDescription
-            }
+            Task { await addSubscription(from: url) }
             return
         }
         addProfile(uri: url.absoluteString)
@@ -251,6 +231,37 @@ final class ProxyManager: ObservableObject {
                 source,
                 text: try await SubscriptionMirrorLoader.load(mirror)
             )
+        }
+    }
+
+    private func addSubscription(from bootstrapURL: URL, fallbackName: String = "") async {
+        let components = URLComponents(url: bootstrapURL, resolvingAgainstBaseURL: false)
+        let items = (components?.queryItems ?? []).reduce(into: [String: String]()) {
+            $0[$1.name] = $1.value ?? ""
+        }
+        guard let source = items["url"], !source.isEmpty else {
+            notice = "В bootstrap-ссылке отсутствует URL подписки"
+            return
+        }
+        do {
+            let mirror: SubscriptionMirror?
+            if let mirrorURL = items["mirror_url"], let mirrorKey = items["mirror_key"] {
+                mirror = try SubscriptionMirror.validated(
+                    type: items["mirror_type"] ?? "yandex_disk",
+                    urlString: mirrorURL,
+                    key: mirrorKey
+                )
+            } else {
+                mirror = nil
+            }
+            let requestedName = fallbackName.trimmingCharacters(in: .whitespacesAndNewlines)
+            await addSubscription(
+                name: requestedName.isEmpty ? (items["name"] ?? "") : requestedName,
+                urlString: source,
+                mirror: mirror
+            )
+        } catch {
+            notice = error.localizedDescription
         }
     }
 

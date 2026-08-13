@@ -12,11 +12,11 @@ struct AddSubscriptionView: View {
         NavigationStack {
             Form {
                 TextField("Название (необязательно)", text: $name)
-                TextField("https://server.example/sub/name", text: $url)
+                TextField("https://… или olcrtc://subscription…", text: $url)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .keyboardType(.URL)
-                Button("Вставить URL") {
+                Button("Вставить ссылку") {
                     url = UIPasteboard.general.string ?? ""
                 }
             }
