@@ -76,7 +76,7 @@ curl -fsSL https://raw.githubusercontent.com/florewa/Olcrtc_manager/master/serve
 
 1. Создать новый GitHub-репозиторий и загрузить туда содержимое этого каталога.
 2. Открыть `Actions -> Build unsigned iOS IPA -> Run workflow`.
-3. Оставить `core_ref=server-v1.9.71`. При обновлении сервера собирать клиент
+3. Оставить `core_ref=server-v1.9.72`. При обновлении сервера собирать клиент
    из того же тега.
 4. Дождаться зелёной сборки.
 5. Скачать artifact `olcrtc-ios-unsigned`.

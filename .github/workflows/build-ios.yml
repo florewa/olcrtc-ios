@@ -10,7 +10,7 @@ on:
       core_ref:
         description: Branch, tag, or commit of olcRTC core
         required: true
-        default: server-v1.9.71
+        default: server-v1.9.72
   push:
     branches: [main]
     tags: ['v*']
@@ -24,7 +24,7 @@ jobs:
     runs-on: macos-15
     env:
       CORE_REPOSITORY: ${{ inputs.core_repository || 'florewa/Olcrtc_manager' }}
-      CORE_REF: ${{ inputs.core_ref || 'server-v1.9.71' }}
+      CORE_REF: ${{ inputs.core_ref || 'server-v1.9.72' }}
     steps:
       - name: Checkout iOS client
         uses: actions/checkout@v4
