@@ -22,8 +22,9 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: community.openlibre.olcrtc.ios
         PRODUCT_NAME: olcRTC
-        MARKETING_VERSION: "0.2.1"
-        CURRENT_PROJECT_VERSION: "3"
+        MARKETING_VERSION: "0.3.0"
+        CURRENT_PROJECT_VERSION: "4"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         GENERATE_INFOPLIST_FILE: false
         INFOPLIST_FILE: App/Info.plist
         FRAMEWORK_SEARCH_PATHS:

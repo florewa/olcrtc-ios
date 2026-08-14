@@ -10,7 +10,7 @@ on:
       core_ref:
         description: Branch, tag, or commit of olcRTC core
         required: true
-        default: server-v1.9.72
+        default: server-v1.9.73
   push:
     branches: [main]
     tags: ['v*']
@@ -24,10 +24,17 @@ jobs:
     runs-on: macos-15
     env:
       CORE_REPOSITORY: ${{ inputs.core_repository || 'florewa/Olcrtc_manager' }}
-      CORE_REF: ${{ inputs.core_ref || 'server-v1.9.72' }}
+      CORE_REF: ${{ inputs.core_ref || 'server-v1.9.73' }}
     steps:
       - name: Checkout iOS client
         uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        run: |
+          XCODE_APP=$(find /Applications -maxdepth 1 -type d -name 'Xcode_26*.app' | sort | tail -n 1)
+          test -n "$XCODE_APP"
+          sudo xcode-select -s "$XCODE_APP/Contents/Developer"
+          xcodebuild -version
 
       - name: Run parser tests
         run: sh Scripts/test-ios.sh

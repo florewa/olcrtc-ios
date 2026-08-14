@@ -77,4 +77,8 @@ struct PersistedState: Codable, Equatable {
     var socksUser: String?
     var socksPassword: String?
     var socksPort: Int?
+    var selectedProfileID: UUID?
+    // Optional for backward-compatible decoding of Keychain data created by
+    // versions that predate the guided Happ setup.
+    var hasImportedHappConfiguration: Bool?
 }

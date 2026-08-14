@@ -37,6 +37,11 @@ enum OlcrtcBridge {
         MobileStop()
     }
 
+    static func health() throws -> TunnelHealthSnapshot {
+        let data = Data(MobileStatusJSON().utf8)
+        return try JSONDecoder().decode(TunnelHealthSnapshot.self, from: data)
+    }
+
     private static func bridgeError(_ message: String) -> NSError {
         NSError(
             domain: "OlcrtcIOS.GoBridge",
