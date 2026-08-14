@@ -16,6 +16,7 @@ let package = Package(
             path: "App",
             exclude: [
                 "Info.plist",
+                "Assets.xcassets",
                 "OlcrtcIOSApp.swift",
                 "Runtime",
                 "Security",

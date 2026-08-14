@@ -56,7 +56,7 @@ struct TunnelHealthSnapshot: Codable, Equatable {
                 : .unhealthy("не получен первый контрольный pong")
         }
         if now.timeIntervalSince(lastPongDate) > staleAfter {
-            return .unhealthy("контрольный канал не отвечает более (Int(staleAfter)) секунд")
+            return .unhealthy("контрольный канал не отвечает более \(Int(staleAfter)) секунд")
         }
         return .healthy
     }
